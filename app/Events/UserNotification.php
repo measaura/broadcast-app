@@ -4,12 +4,9 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
 class UserNotification implements ShouldBroadcast
 {
@@ -23,7 +20,6 @@ class UserNotification implements ShouldBroadcast
      */
     public function __construct(string $message, string $type = 'info')
     {
-        // Log::info('UserNotification event created', ['message' => $message, 'type' => $type]);
         $this->message = $message;
         $this->type = $type;
     }
@@ -35,23 +31,9 @@ class UserNotification implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        log::info('Broadcasting on notifications channel', ['message' => $this->message, 'type' => $this->type]);
-        // Return a new Channel instance for the 'notifications' channel
         return 
             [new Channel('notifications'),]
         ;
     }
-    public function broadcastAs(): string
-    {
-        return 'UserNotification';
-    }
-    public function broadcastWith(): array
-    {
-        $data = [
-            'message' => $this->message,
-            'type' => $this->type,
-        ];
-        log::info('Broadcasting with data', $data);
-        return $data;
-    }
+
 }
