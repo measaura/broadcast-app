@@ -9,30 +9,17 @@ interface NotificationMessage {
 const NotificationPopup: React.FC = () => {
   const [notification, setNotification] = useState<NotificationMessage | null>(null);
 
-  const handleNotification = useCallback((eventPayload: NotificationMessage) => {
-    console.log('===NOTIFICATION RECEIVED===');
-    console.log('Event Payload:', eventPayload);
-    console.log('Type of eventPayload:', typeof eventPayload);
-    console.log('eventPayload Keys:', Object.keys(eventPayload || {}));
+  const handleNotification = useCallback((payload: any) => {
+    // console.log('Raw notification payload:', payload);
 
-    let parsedData = eventPayload;
-    // If the payload is a string, try to parse it as JSON
-    if (typeof eventPayload === 'string') {
-      try {
-        parsedData = JSON.parse(eventPayload);
-        console.log('Parsed Data:', parsedData);
-      } catch (error) {
-        console.error('Failed to parse eventPayload as JSON:', error);
-      }
-    }
+    // Handle different payload formats
+    let messageData: NotificationMessage;
+    messageData = payload;
 
-    const message = parsedData?.message || 'Unknown message';
-    const type = parsedData?.type || 'info';
-    console.log('Extracted Message:', message, 'Type:', type);
     // Set the notification state with the parsed data
     setNotification({
-      message: message,
-      type: type as 'info' | 'success' | 'warning' | 'error',
+      message: messageData.message,
+      type: messageData.type || 'info'
     });
 
     setTimeout(() => {
@@ -47,27 +34,16 @@ const NotificationPopup: React.FC = () => {
     }
 
   }
-  console.log('before useEchoPublic.');
-  //{"event":"UserNotification","data":"{\"message\":\"Hello from Postman!\",\"type\":\"success\"}","channel":"notifications"}	1748088103.4640136
+
   useEchoPublic<NotificationData>( // Optional: Generic type for the payload
-    'notifications',                             // Channel Name
-    //".App\\Events\\UserNotification",            // Event Name (prefixed with '.')
-    //".App.Events.UserNotification",            // Event Name (prefixed with '.')
-    "UserNotification", // Event Name (prefixed with '.')
-     //handleNotification, // Callback
-     (e) => {
-      console.log('Notification received (via useEchoPublic):', e.data.message, 'Type:', e.data.type);
-      // handleNotification(e.data);
-     },
+    'notifications',      // Channel Name
+    "UserNotification",   // Event Name (prefixed with '.')
+     handleNotification,  // Callback
   );
   
   // Log when the component mounts to see if the subscription occurs implicitly
   useEffect(() => {
     console.log('NotificationPopup mounted. useEchoPublic should be handling subscription and listening.');
-    // We can also check if the global Echo instance's channels list reflects this subscription for debugging.
-    // if ((window as any).Echo) {
-    //   console.log('Current Echo channels:', (window as any).Echo.connector.channels);
-    // }
   }, []);
 
 
