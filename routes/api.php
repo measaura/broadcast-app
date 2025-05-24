@@ -29,9 +29,9 @@ Route::post('/send-notification', function (Request $request) {
     $type = $validated['type'] ?? 'info'; // Default to 'info' if not provided
 
     try {
-        // UserNotification::dispatch($message, $type);
-        // Or: event(new UserNotification($message, $type));
-        event(new UserNotification($message, $type));
+        // log::info('Dispatching UserNotification event', ['message' => $message, 'type' => $type]);
+        // Dispatch the UserNotification event
+        UserNotification::dispatch($message, $type);
 
         return response()->json([
             'status' => 'success',
